@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asistente Docente · Prototipo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F3F6F5;--surface:#fff;--ink:#12211E;--muted:#5B6B67;--line:#D9E2DF;--pri:#0F5C55;--on-pri:#fff;--chalk:#F2C94C;--ok:#1F7A4D;--soft:#E4F0ED;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D1614;--surface:#15211E;--ink:#E7F0EE;--muted:#93A6A1;--line:#26362F;--pri:#4FC3B3;--on-pri:#06211D;--ok:#63D39A;--soft:#1B2E2A}}
+:root[data-theme="dark"]{--bg:#0D1614;--surface:#15211E;--ink:#E7F0EE;--muted:#93A6A1;--line:#26362F;--pri:#4FC3B3;--on-pri:#06211D;--ok:#63D39A;--soft:#1B2E2A}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;line-height:1.15;margin:0}
+main{max-width:640px;margin:0 auto;padding:20px 16px 96px}
+.view{display:none}.view.on{display:block}
+h1{font-size:30px;font-weight:700}
+h2{font-size:22px;font-weight:700;margin-bottom:4px}
+h3{font-size:17px;font-weight:500}
+.lead{color:var(--muted);margin:8px 0 18px}
+.hero{background:var(--pri);color:var(--on-pri);border-radius:18px;padding:22px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero p{margin:10px 0 0;opacity:.9}
+.hero::after{content:"";position:absolute;right:-10px;bottom:0;width:120px;height:6px;background:var(--chalk);border-radius:3px 0 0 3px}
+.tool{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:10px;font:inherit;color:inherit;cursor:pointer}
+.tool b{display:block;font-family:"Bricolage Grotesque",Figtree,sans-serif;font-size:18px;font-weight:500}
+.tool span{color:var(--muted);font-size:14.5px}
+.ico{flex:none;width:40px;height:40px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-size:20px}
+.note{font-size:14px;color:var(--muted);border-left:4px solid var(--chalk);padding:2px 0 2px 12px;margin:18px 0}
+label{display:block;font-weight:600;font-size:14.5px;margin:14px 0 6px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+textarea{min-height:96px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+.btn{font:inherit;font-weight:600;border:0;border-radius:12px;padding:13px 18px;background:var(--pri);color:var(--on-pri);cursor:pointer;width:100%;margin-top:18px}
+.btn.sec{background:var(--soft);color:var(--ink);margin-top:0;width:auto;padding:9px 14px;font-size:14px}
+.btn.ok{background:var(--ok);color:#fff}
+.out{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+.badge{display:inline-block;font-size:13px;background:var(--chalk);color:#2b2200;border-radius:999px;padding:3px 10px;font-weight:600;margin-bottom:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.card.done{border-color:var(--ok)}
+.card .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.card .top input{width:22px;height:22px;flex:none;accent-color:var(--ok)}
+.card textarea{min-height:120px;font-size:15px}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.hist{list-style:none;padding:0;margin:8px 0 0}
+.hist li{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:14.5px}
+.hist small{color:var(--muted);display:block}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;max-width:150px;background:none;border:0;font:inherit;font-size:12.5px;color:var(--muted);padding:6px 2px;cursor:pointer;border-radius:10px}
+nav button span{display:block;font-size:20px}
+nav button[aria-current="page"]{color:var(--ink);font-weight:600;background:var(--soft)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<main>
+
+<section class="view on" id="v-inicio">
+  <div class="hero">
+    <h1>Menos papeleo, más clase.</h1>
+    <p>La IA prepara los borradores. Tú decides, editas y envías.</p>
+  </div>
+  <button class="tool" data-go="incidente"><div class="ico">🩹</div><div><b>Incidente con un estudiante</b><span>Protocolo paso a paso, con el mensaje listo para cada persona.</span></div></button>
+  <button class="tool" data-go="observador"><div class="ico">📝</div><div><b>Observador del estudiante</b><span>Escribe notas breves y recibe un registro completo.</span></div></button>
+  <button class="tool" data-go="padres"><div class="ico">💬</div><div><b>Comunicación con familias</b><span>Comunicados en el tono adecuado según la situación.</span></div></button>
+  <p class="note">Prototipo basado en el diagnóstico de carga administrativa docente. Los textos se generan con plantillas de ejemplo; en el producto real los redactaría un modelo de IA. Los datos no salen de tu dispositivo.</p>
+</section>
+
+<section class="view" id="v-incidente">
+  <h2>Incidente con un estudiante</h2>
+  <p class="lead">Cuéntanos lo básico y arma el protocolo mientras sigues con tu clase.</p>
+  <label for="i-n">Estudiante</label><input id="i-n" placeholder="Ej: Camila Rojas">
+  <div class="row">
+    <div><label for="i-c">Curso</label><input id="i-c" placeholder="Ej: 3°B"></div>
+    <div><label for="i-h">Hora</label><input id="i-h" type="time"></div>
+  </div>
+  <label for="i-t">¿Qué pasó?</label>
+  <select id="i-t"><option value="a">Accidente</option><option value="e">Enfermedad o malestar</option><option value="o">Otra situación</option></select>
+  <label for="i-d">Detalle breve</label><textarea id="i-d" placeholder="Ej: Se cayó en el recreo y se golpeó el brazo derecho."></textarea>
+  <button class="btn" id="i-go">Generar protocolo</button>
+  <div class="out" id="i-out" hidden></div>
+</section>
+
+<section class="view" id="v-observador">
+  <h2>Observador del estudiante</h2>
+  <p class="lead">Escribe lo que viste, en tus palabras. El registro formal lo armamos por ti.</p>
+  <label for="o-n">Estudiante</label><input id="o-n" placeholder="Ej: Juan Pérez">
+  <div class="row">
+    <div><label for="o-c">Curso</label><input id="o-c" placeholder="Ej: 5°A"></div>
+    <div><label for="o-t">Tipo</label><select id="o-t"><option>Académico</option><option>Comportamental</option><option>Mixto</option></select></div>
+  </div>
+  <label for="o-d">Tus notas</label><textarea id="o-d" placeholder="Ej: no entregó la tarea de matemáticas por segunda vez, se distrae con un compañero, pero participa mucho en lectura."></textarea>
+  <button class="btn" id="o-go">Generar registro</button>
+  <div class="out" id="o-out" hidden></div>
+  <div id="o-hist" hidden><h3 style="margin-top:26px">Aprobados en esta sesión</h3><ul class="hist" id="o-list"></ul></div>
+</section>
+
+<section class="view" id="v-padres">
+  <h2>Comunicación con familias</h2>
+  <p class="lead">Elige la situación y ajusta el mensaje antes de enviarlo.</p>
+  <label for="p-s">Situación</label>
+  <select id="p-s"><option value="reu">Citar a reunión</option><option value="tar">Tareas pendientes</option><option value="fel">Felicitación</option><option value="com">Situación de comportamiento</option><option value="act">Actividad institucional</option></select>
+  <div class="row">
+    <div><label for="p-n">Estudiante</label><input id="p-n" placeholder="Ej: Valeria"></div>
+    <div><label for="p-m">Tu nombre</label><input id="p-m" placeholder="Ej: Prof. Andrés"></div>
+  </div>
+  <label for="p-d">Detalle (opcional)</label><textarea id="p-d" placeholder="Ej: fecha, motivo o actividad concreta."></textarea>
+  <button class="btn" id="p-go">Redactar mensaje</button>
+  <div class="out" id="p-out" hidden></div>
+</section>
+
+</main>
+
+<nav id="nav" aria-label="Secciones">
+  <button data-go="inicio"><span>🏠</span>Inicio</button>
+  <button data-go="incidente"><span>🩹</span>Incidente</button>
+  <button data-go="observador"><span>📝</span>Observador</button>
+  <button data-go="padres"><span>💬</span>Familias</button>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+var v=function(i,f){var x=$(i).value.trim();return x||f};
+var hoy=new Date().toLocaleDateString('es-CO',{day:'numeric',month:'long',year:'numeric'});
+
+function go(t){
+  document.querySelectorAll('.view').forEach(function(s){s.classList.toggle('on',s.id==='v-'+t)});
+  document.querySelectorAll('#nav button').forEach(function(b){
+    if(b.dataset.go===t)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.go)})});
+go('inicio');
+
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},1800)}
+function copy(txt){
+  try{navigator.clipboard.writeText(txt).then(function(){toast('Copiado')},function(){toast('Selecciona y copia el texto')})}
+  catch(e){toast('Selecciona y copia el texto')}
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+
+/* ---------- Incidente ---------- */
+$('i-go').addEventListener('click',function(){
+  var n=v('i-n','[Nombre del estudiante]'),c=v('i-c','[curso]'),h=v('i-h','[hora]'),
+      d=v('i-d','[describe brevemente lo ocurrido]'),t=$('i-t').value;
+  var q={a:'sufrió un accidente',e:'presenta un malestar de salud',o:'estuvo involucrado en una situación que requiere su atención'}[t];
+  var steps=[
+    ['Acudientes','Buen día. Le informo que '+n+' ('+c+') '+q+' hoy a las '+h+'. '+d+' Estamos atentos a su bienestar. ¿Podría comunicarse con el colegio o recogerlo(a) cuanto antes? Quedo atento(a) a su respuesta.'],
+    ['Enfermería','Envío a '+n+' ('+c+'). Motivo: '+q+' a las '+h+'. '+d+' Solicito valoración y me indican si requiere traslado.'],
+    ['Coordinación','Le informo que hoy a las '+h+' '+n+' ('+c+') '+q+'. '+d+' Ya se avisó a acudientes y a enfermería. Quedo pendiente de sus indicaciones.'],
+    ['Rectoría (si aplica)','Para su conocimiento: hoy a las '+h+' '+n+' ('+c+') '+q+'. La situación se está manejando con coordinación y enfermería.'],
+    ['Orientación escolar (si aplica)','Le comparto lo ocurrido con '+n+' ('+c+'): '+d+' Considero que podría requerir acompañamiento. ¿Cuándo podemos conversar?'],
+    ['Reporte del caso','REPORTE DE INCIDENTE\nFecha: '+hoy+'   Hora: '+h+'\nEstudiante: '+n+'   Curso: '+c+'\nTipo: '+q+'\nDescripción: '+d+'\nAcciones: acudientes, enfermería y coordinación informados. Rectoría y orientación según el caso.\nDocente responsable: [tu nombre]\nObservaciones: [completar]']
+  ];
+  var o=$('i-out');
+  o.innerHTML='<span class="badge">Borradores: revísalos antes de enviar</span><p class="lead" style="margin-top:0">Marca cada paso a medida que lo cumples.</p>'+
+    steps.map(function(s,i){return '<div class="card" id="ic'+i+'"><div class="top"><input type="checkbox" aria-label="Paso hecho" data-i="'+i+'"><h3>'+s[0]+'</h3></div><textarea>'+esc(s[1])+'</textarea><div class="actions"><button class="btn sec" data-copy="'+i+'">Copiar</button></div></div>'}).join('');
+  o.hidden=false;
+  o.querySelectorAll('input[type=checkbox]').forEach(function(x){x.addEventListener('change',function(){$('ic'+x.dataset.i).classList.toggle('done',x.checked)})});
+  o.querySelectorAll('[data-copy]').forEach(function(b){b.addEventListener('click',function(){copy($('ic'+b.dataset.copy).querySelector('textarea').value)})});
+  o.scrollIntoView({behavior:'smooth'});
+});
+
+/* ---------- Observador ---------- */
+$('o-go').addEventListener('click',function(){
+  var n=v('o-n','[Nombre del estudiante]'),c=v('o-c','[curso]'),t=$('o-t').value,d=v('o-d','[agrega tus notas]');
+  var partes=d.split(/[.;\n]+|,\s*(?=pero|aunque)/i).map(function(x){return x.trim()}).filter(Boolean);
+  var lista=partes.map(function(p){p=p.replace(/^pero\s+/i,'');return '• '+p.charAt(0).toUpperCase()+p.slice(1)}).join('\n');
+  var txt='OBSERVADOR DEL ESTUDIANTE\nFecha: '+hoy+'\nEstudiante: '+n+'   Curso: '+c+'\nTipo de seguimiento: '+t+'\n\nSituación observada:\n'+lista+'\n\nFortalezas identificadas: [completar o confirmar]\n\nCompromisos y acciones de seguimiento:\n• Conversar con el estudiante sobre lo observado.\n• Informar al acudiente si la situación se repite.\n• Revisar avances en la próxima semana.\n\nDocente: [tu nombre]';
+  var o=$('o-out');
+  o.innerHTML='<span class="badge">Borrador: revísalo y ajústalo</span><div class="card"><textarea id="o-txt" style="min-height:300px">'+esc(txt)+'</textarea><div class="actions"><button class="btn sec" id="o-copy">Copiar</button><button class="btn sec ok" id="o-ok">Aprobar y guardar</button></div></div>';
+  o.hidden=false;
+  $('o-copy').addEventListener('click',function(){copy($('o-txt').value)});
+  $('o-ok').addEventListener('click',function(){
+    var li=document.createElement('li');
+    li.innerHTML='<b>'+esc(n)+'</b> · '+esc(c)+'<small>'+esc(t)+' · '+hoy+' · revisado por ti</small>';
+    $('o-list').prepend(li);$('o-hist').hidden=false;toast('Registro guardado');
+  });
+  o.scrollIntoView({behavior:'smooth'});
+});
+
+/* ---------- Padres ---------- */
+$('p-go').addEventListener('click',function(){
+  var n=v('p-n','[estudiante]'),m=v('p-m','[Docente]'),d=v('p-d',''),s=$('p-s').value;
+  var x=d?' '+d.charAt(0).toUpperCase()+d.slice(1)+(/[.!?]$/.test(d)?'':'.'):'';
+  var body={
+    reu:'Espero que se encuentre muy bien. Me gustaría conversar con usted sobre el proceso de '+n+'.'+x+' ¿Podría indicarme qué día y hora le resultan convenientes para reunirnos? Agradezco su disposición.',
+    tar:'Le escribo para contarle que '+n+' tiene algunas actividades pendientes por entregar.'+x+' Le agradezco su apoyo para ponerse al día. Con gusto puedo orientar a '+n+' si lo necesita.',
+    fel:'Quiero compartirle una buena noticia: '+n+' ha tenido un desempeño muy positivo últimamente.'+x+' Es un gusto acompañar su proceso y quise que usted también lo supiera.',
+    com:'Me comunico para compartirle una situación de convivencia en la que participó '+n+'.'+x+' Lo hablé con '+n+' en un tono de acompañamiento. Creo que trabajar juntos nos ayudará a que no se repita. ¿Podemos conversar?',
+    act:'Le informo que el colegio realizará una actividad institucional en la que '+n+' participará.'+x+' Le agradezco estar atento(a) a la información sobre permisos y materiales. Cualquier duda, con gusto la resuelvo.'
+  }[s];
+  var txt='Estimada familia de '+n+':\n\n'+body+'\n\nCordialmente,\n'+m;
+  var o=$('p-out');
+  o.innerHTML='<span class="badge">Borrador: revísalo antes de enviar</span><div class="card"><textarea id="p-txt" style="min-height:230px">'+esc(txt)+'</textarea><div class="actions"><button class="btn sec" id="p-copy">Copiar</button></div></div>';
+  o.hidden=false;
+  $('p-copy').addEventListener('click',function(){copy($('p-txt').value)});
+  o.scrollIntoView({behavior:'smooth'});
+});
+</script>
+</body>
+</html>
